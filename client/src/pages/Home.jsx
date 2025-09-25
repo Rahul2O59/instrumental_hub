@@ -1,42 +1,57 @@
-import React from "react";
-import heroImg from "../assets/hero.jpg";
-import guitarImg from "../assets/guitar.jpg";
-import pianoImg from "../assets/piano.jpg";
-import drumsImg from "../assets/drums.jpg";
+// src/pages/Home.jsx
+"use client";
+
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
+import { Button } from "../components/ui/button"; 
+
+import homeProducts from "../data/homeProducts";
 import "./Home.css";
 
-function Home() {
-  return (
-    <div className="home">
-      {/* Hero Section */}
-      <section className="hero" style={{ backgroundImage: `url(${heroImg})` }}>
-        <div className="hero-overlay">
-          <h2>Welcome to Instrumental Hub</h2>
-          <p>Find the perfect instrument for your music journey</p>
-          <a href="/products" className="btn">Shop Now</a>
-        </div>
-      </section>
+const CategorySection = ({ title, items = [] }) => {
+  const { addToCart } = useContext(CartContext);
 
-      {/* Featured Instruments */}
-      <section className="featured">
-        <h2>Featured Instruments</h2>
-        <div className="featured-grid">
-          <div className="featured-card">
-            <img src={guitarImg} alt="Guitar" />
-            <h3>Acoustic Guitar</h3>
-          </div>
-          <div className="featured-card">
-            <img src={pianoImg} alt="Piano" />
-            <h3>Electric Piano</h3>
-          </div>
-          <div className="featured-card">
-            <img src={drumsImg} alt="Drums" />
-            <h3>Drum Set</h3>
-          </div>
-        </div>
-      </section>
+  return (
+    <div className="category-section">
+      <h2>{title}</h2>
+      <div className="products-grid">
+        {Array.isArray(items) && items.length > 0 ? (
+          items.map((item) => (
+            <div key={item.id} className="product-card">
+              <img src={item.image} alt={item.name} />
+              <h3>{item.name}</h3>
+              <p>${item.price}</p>
+              <Button onClick={() => addToCart(item)}>Add to Cart</Button>
+            </div>
+          ))
+        ) : (
+          <p>No products available in this category.</p>
+        )}
+      </div>
     </div>
   );
-}
+};
+
+const Home = () => {
+  const safeHomeProducts = {
+    topSelling: Array.isArray(homeProducts.topSelling) ? homeProducts.topSelling : [],
+    trending: Array.isArray(homeProducts.trending) ? homeProducts.trending : [],
+    onSale: Array.isArray(homeProducts.onSale) ? homeProducts.onSale : [],
+    offers: Array.isArray(homeProducts.offers) ? homeProducts.offers : [],
+    reviews: Array.isArray(homeProducts.reviews) ? homeProducts.reviews : [],
+  };
+
+  return (
+    <div className="home-container">
+      <h1>Welcome to Instrumental Hub</h1>
+      <p>Your one-stop shop for musical instruments</p>
+      <CategorySection title=" Top Selling" items={safeHomeProducts.topSelling} />
+      <CategorySection title=" Trending Now" items={safeHomeProducts.trending} />
+      <CategorySection title=" On Sale" items={safeHomeProducts.onSale} />
+      <CategorySection title=" Special Offers" items={safeHomeProducts.offers} />
+      <CategorySection title=" Customer Reviews" items={safeHomeProducts.reviews} />
+    </div>
+  );
+};
 
 export default Home;
